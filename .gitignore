@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+.venv-*/
+venv/
+env/
+
+# Local secrets (template: .env.example)
+.env
+.env.*
+!.env.example
+
+# Generated pipeline outputs — a curated sample lives in docs/sample-output/
+reports/*
+!reports/.gitkeep
+screenshots/*
+!screenshots/.gitkeep
+corpus/generated_test_cases.json
+
+# Voice models (Vosk, ~50 MB)
+**/voice/models/
+
+# Node / Appium / Playwright artifacts
+node_modules/
+test-results/
+playwright-report/
+
+# Archives and temp files
+*.zip
+*.tmp
+*.log
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

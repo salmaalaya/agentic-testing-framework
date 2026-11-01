@@ -1,0 +1,30 @@
+# Core dependencies — API + Web channels, evaluation, reporting.
+# Heavy/optional extras (NLI, mobile, voice) live in requirements-optional.txt.
+
+# Multi-agent orchestration + LLM client (Ollama exposes an OpenAI-compatible API)
+# The PyPI package "openai-swarm" is an unrelated fork: install Swarm from GitHub.
+swarm @ git+https://github.com/openai/swarm.git
+openai>=1.33.0
+
+# Target app (fictional TechShop chatbot) + HTTP channel
+fastapi>=0.111.0
+uvicorn[standard]>=0.30.1
+jinja2>=3.1.4
+httpx>=0.27.0,<0.28
+pydantic>=2.7.3
+
+# Web channel (run `python -m playwright install chromium` once after install)
+playwright>=1.44.0
+
+# NLP metrics — nltk 3.8.x breaks on Python 3.13 (Fraction(_normalize=...) was removed)
+nltk>=3.9.1
+rouge-score>=0.1.2
+
+# Reporting
+plotly>=5.22.0,<6
+reportlab>=4.0
+matplotlib>=3.8
+
+# Utilities
+python-dotenv>=1.0.1
+rich>=13.7.1

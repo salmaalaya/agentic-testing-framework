@@ -1,0 +1,22 @@
+# Optional extras — NOT needed for the API/Web pipeline, the unit tests or CI.
+# Install only what you need; each block degrades gracefully when missing.
+
+# ── NLI hallucination score (`run_pipeline.py --nli`) ── ~700 MB on disk in total
+# torch CPU wheel (~120 MB) must come from the PyTorch index, otherwise pip pulls
+# the CUDA build (2-3 GB):
+#   pip install --index-url https://download.pytorch.org/whl/cpu torch
+# The NLI model (MoritzLaurer/mDeBERTa-v3-base-mnli-xnli, ~560 MB) is downloaded
+# on first use into the Hugging Face cache.
+# Windows: requires the Visual C++ Redistributable to load torch.
+transformers>=4.40          # ~20 MB with tokenizers/safetensors
+
+# ── Mobile channel (Appium + Android emulator) ── ~1 MB (plus Android SDK / Node.js / Appium server)
+Appium-Python-Client>=3.1.1
+
+# ── Voice interface (STT/TTS around the chatbot) ── ~15 MB + Vosk FR model (~50 MB, downloaded on first use)
+vosk>=0.3.45
+SpeechRecognition>=3.10.4
+sounddevice>=0.4.7
+soundfile>=0.12.1
+numpy>=1.26
+pyttsx3>=2.90

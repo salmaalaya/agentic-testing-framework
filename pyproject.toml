@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agentic-testing"
+version = "1.0.0"
+description = "Multi-agent testing pipeline for conversational agents (OpenAI Swarm + Ollama) across API, Web and Mobile channels."
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [{ name = "Salma Alaya" }]
+requires-python = ">=3.11"
+dynamic = ["dependencies"]
+
+[project.scripts]
+agentic-testing = "agentic_testing.pipeline:main"
+
+[tool.setuptools.dynamic]
+dependencies = { file = ["requirements.txt"] }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "."]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+extend-exclude = [".venv", ".venv-*"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B"]
+# E501: long French comments/prompts are intentional; ruff format handles code width.
+# E402: modules call load_dotenv() before reading env-dependent imports.
+ignore = ["E501", "E402"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["agentic_testing", "target_app", "scripts"]
