@@ -724,7 +724,7 @@ def health():
 @app.get("/", response_class=HTMLResponse)
 def chat_ui(request: Request):
     """Interface Web du chatbot — testée par Playwright."""
-    return templates.TemplateResponse("chat.html", {"request": request})
+    return templates.TemplateResponse(request, "chat.html")
 
 
 @app.get("/studio", response_class=HTMLResponse)
@@ -734,7 +734,7 @@ def studio_ui(request: Request):
     agents de test Swarm et leurs résultats réels, avec accès direct au
     tableau de bord et au rapport PDF.
     """
-    return templates.TemplateResponse("studio.html", {"request": request})
+    return templates.TemplateResponse(request, "studio.html")
 
 
 @app.get("/dashboard", response_class=HTMLResponse)
@@ -745,7 +745,7 @@ def dashboard_ui(request: Request):
     au fichier reports/dashboard.html qui est un instantané figé au moment
     de sa génération.
     """
-    return templates.TemplateResponse("dashboard_live.html", {"request": request})
+    return templates.TemplateResponse(request, "dashboard_live.html")
 
 
 def _read_json(path: Path) -> dict | None:
