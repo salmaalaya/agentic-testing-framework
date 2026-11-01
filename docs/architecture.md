@@ -4,6 +4,10 @@ This document describes how the pipeline is wired, what each agent owns, and
 which files flow between stages. For setup and results, see the
 [README](../README.md).
 
+> Built during a 4th-year engineering internship (ESPRIT), carried out at
+> Value (July – September 2026). The chatbot under test, TechShop, is
+> fictional: no company data, client data or proprietary code is included.
+
 ## Overview
 
 ```mermaid

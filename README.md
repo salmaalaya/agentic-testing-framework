@@ -9,6 +9,14 @@
 
 ![Results dashboard](docs/images/dashboard.png)
 
+## Context
+
+This project was built as part of my **4th-year engineering internship (Stage d'Ingénieur)** at **ESPRIT** (École Supérieure Privée d'Ingénierie et de Technologies, Tunis), carried out at **Value** (July – September 2026).
+
+The goal was to design an autonomous testing system for conversational agents, replacing slow and subjective manual testing with a pipeline of cooperating AI agents.
+
+The chatbot under test ("TechShop") is a **fictional e-commerce assistant** created for this project. No company data, client data or proprietary code is included in this repository.
+
 ## Why this project
 
 Testing a conversational agent is not like testing a REST endpoint: the same
@@ -281,5 +289,7 @@ agentic-testing-framework/
 
 ## Author
 
-**Salma Alaya** — [GitHub](https://github.com/salmaalaya)
-<!-- LinkedIn: add your profile URL here -->
+**Salma Alaya**, Engineering student in Data Science & AI at ESPRIT<br>
+Internship: Value, 2026 (4th-year engineering internship)<br>
+LinkedIn: https://www.linkedin.com/in/alaya-salma-a2470b225/<br>
+GitHub: https://github.com/salmaalaya
