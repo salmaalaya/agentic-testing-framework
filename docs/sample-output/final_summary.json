@@ -1,0 +1,19 @@
+{
+  "generated_at": "2026-11-01T01:31:10.364016",
+  "pipeline": "Swarm (Generator → Executor → Evaluator → Reporter)",
+  "summary": {
+    "total": 23,
+    "passed": 17,
+    "failed": 6,
+    "warned": 0,
+    "errors": 0,
+    "success_rate_pct": 73.9,
+    "hallucinations_detected": 3,
+    "avg_scores": {
+      "pertinence": 4.09,
+      "exactitude": 3.91,
+      "coherence": 4.04,
+      "score_moyen": 4.01
+    }
+  }
+}
