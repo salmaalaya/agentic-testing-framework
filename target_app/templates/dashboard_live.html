@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard · TechShop QA Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+<style>
+:root {
+  --bg: #0B0F1A; --surface: #10182A; --surface-2: #16203A; --border: #212B45;
+  --text: #E7ECF5; --text-dim: #8B96AD; --accent: #6D5DFB; --accent-soft: #241D5C;
+  --cyan: #22D3EE; --pass: #34D399; --fail: #F87171; --warn: #FBBF24; --error: #94A3B8; --halluc: #FB7185;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0; background: radial-gradient(circle at 12% 0%, #16204A 0%, var(--bg) 45%) var(--bg);
+  color: var(--text); font-family: 'Inter', sans-serif; line-height: 1.5; min-height: 100vh;
+}
+h1, h2, h3, .brand { font-family: 'Space Grotesk', sans-serif; }
+.mono { font-family: 'JetBrains Mono', monospace; }
+a { color: inherit; text-decoration: none; }
+
+nav { position: sticky; top: 0; z-index: 50; display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 48px; background: rgba(11,15,26,.82); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); }
+.brand { font-weight: 700; font-size: 1.05rem; display: flex; align-items: center; gap: 8px; }
+.brand-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+.nav-links { display: flex; gap: 28px; font-size: 0.88rem; color: var(--text-dim); }
+.nav-links a:hover { color: var(--text); }
+.status-pill { display: flex; align-items: center; gap: 7px; font-size: 0.78rem; padding: 5px 12px; border-radius: 999px;
+  background: var(--surface-2); border: 1px solid var(--border); color: var(--text-dim); }
+.status-pill .pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--pass); box-shadow: 0 0 6px var(--pass);
+  animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.35; } }
+
+.hero { padding: 48px 48px 8px; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 24px; }
+.hero-tag { display:inline-block; padding:4px 12px; border-radius:999px; background:var(--accent-soft); color:#B4A9FF;
+  font-size:0.75rem; letter-spacing:0.08em; text-transform:uppercase; font-weight:600; margin-bottom:14px; }
+.hero h1 { font-size: 2rem; margin: 0 0 6px 0; font-weight:700; letter-spacing:-0.01em; }
+.hero p.sub { color: var(--text-dim); margin:0; font-size:0.92rem; }
+.hero-kpi { text-align:right; }
+.hero-kpi .big { font-size:3rem; font-weight:700; font-family:'Space Grotesk',sans-serif;
+  background:linear-gradient(90deg,#8F7CFF,#22D3EE); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.hero-kpi .lbl { color:var(--text-dim); font-size:0.85rem; }
+
+.section { padding: 40px 48px; border-top:1px solid var(--border); }
+.section h2 { font-size:1.3rem; margin:0 0 4px 0; display:flex; align-items:center; gap:12px; }
+.eyebrow { font-family:'JetBrains Mono',monospace; font-size:0.75rem; color:var(--accent); border:1px solid var(--accent-soft);
+  padding:2px 8px; border-radius:6px; }
+.section-sub { color:var(--text-dim); font-size:0.88rem; margin:6px 0 24px 0; }
+
+.kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:14px; }
+.kpi { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:18px 20px; }
+.kpi .val { font-size:1.9rem; font-weight:700; font-family:'Space Grotesk',sans-serif; }
+.kpi .lbl { color:var(--text-dim); font-size:0.8rem; margin-top:2px; }
+.pass-c { color: var(--pass); } .fail-c { color: var(--fail); } .warn-c { color: var(--warn); } .halluc-c { color: var(--halluc); }
+
+.charts-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:8px; }
+.chart-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:12px; min-height: 320px; }
+.full { grid-column: 1 / -1; }
+
+.gallery { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:16px; }
+.shot { margin:0; background:var(--surface); border:1px solid var(--border); border-radius:12px; overflow:hidden;
+  cursor:zoom-in; transition: transform .15s ease, border-color .15s ease; }
+.shot:hover { transform: translateY(-3px); border-color: var(--accent); }
+.shot img { width:100%; display:block; aspect-ratio: 16/11; object-fit:cover; object-position: top; background:#fff; }
+.shot figcaption { display:flex; justify-content:space-between; align-items:center; padding:10px 12px; gap: 8px;}
+.shot-id { font-family:'JetBrains Mono',monospace; font-size:0.78rem; color:var(--text-dim); }
+
+.badge { display:inline-block; padding:3px 10px; border-radius:999px; font-size:0.74rem; font-weight:600; white-space:nowrap; }
+.badge.pass { background:#0F2E22; color:var(--pass); }
+.badge.fail { background:#341717; color:var(--fail); }
+.badge.warn { background:#332B0C; color:var(--warn); }
+.badge.error { background:#1E2434; color:var(--error); }
+
+.table-wrap { background:var(--surface); border:1px solid var(--border); border-radius:14px; overflow:auto; }
+table { width:100%; border-collapse:collapse; font-size:0.85rem; }
+th { text-align:left; padding:12px 14px; color:var(--text-dim); font-weight:600; font-size:0.75rem;
+  text-transform:uppercase; letter-spacing:0.03em; border-bottom:1px solid var(--border); position:sticky; top:0; background:var(--surface); }
+td { padding:11px 14px; border-bottom:1px solid var(--border); vertical-align:top; }
+tr:last-child td { border-bottom:none; }
+td.reason { color:var(--text-dim); max-width:280px; }
+.dim { color:var(--text-dim); }
+.filters { margin-bottom:16px; display:flex; gap:8px; }
+.filter-btn { background:var(--surface-2); border:1px solid var(--border); color:var(--text); padding:6px 14px;
+  border-radius:999px; font-size:0.8rem; cursor:pointer; font-family:'Inter',sans-serif; }
+.filter-btn.active { background:var(--accent); border-color:var(--accent); color:white; }
+
+#lightbox { display:none; position:fixed; inset:0; background:rgba(4,6,14,.92); z-index:999; align-items:center;
+  justify-content:center; flex-direction:column; padding:32px; cursor:zoom-out; }
+#lightbox img { max-width:min(900px,90vw); max-height:78vh; border-radius:10px; box-shadow:0 20px 60px rgba(0,0,0,.6); }
+#lightbox .cap { color:var(--text); margin-top:16px; font-family:'JetBrains Mono',monospace; font-size:0.85rem; }
+
+.empty-state { text-align: center; padding: 60px 20px; color: var(--text-dim); }
+.empty-state h3 { color: var(--text); margin-bottom: 8px; }
+
+footer { padding: 28px 48px; color: var(--text-dim); font-size: 0.8rem; display: flex; justify-content: space-between;
+  flex-wrap: wrap; gap: 8px; border-top: 1px solid var(--border); }
+
+@media (max-width: 900px) {
+  nav, .hero, .section { padding-left: 20px; padding-right: 20px; }
+  .charts-grid { grid-template-columns:1fr; }
+  .hero-kpi { text-align:left; }
+  .nav-links { display: none; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/studio" class="brand"><span class="brand-dot"></span> TechShop QA Studio</a>
+  <div class="nav-links">
+    <a href="/studio#chat">Discuter</a>
+    <a href="/studio#agents">Les agents</a>
+    <a href="/dashboard">Dashboard</a>
+  </div>
+  <div class="status-pill"><span class="pulse"></span> <span id="refresh-label">Chargement…</span></div>
+</nav>
+
+<header class="hero">
+  <div>
+    <span class="hero-tag">Données en direct · Auto-actualisation 15s</span>
+    <h1>Dashboard — Résultats du pipeline</h1>
+    <p class="sub" id="hero-sub">Chargement des résultats…</p>
+  </div>
+  <div class="hero-kpi">
+    <div class="big" id="rate-big">—</div>
+    <div class="lbl">taux de réussite global</div>
+  </div>
+</header>
+
+<div id="empty-state" class="empty-state" style="display:none;">
+  <h3>Aucun résultat pour le moment</h3>
+  <p>Lance <code class="mono">python run_pipeline.py --skip-generator --no-check</code> puis reviens sur cette page — elle se mettra à jour automatiquement.</p>
+</div>
+
+<div id="content" style="display:none;">
+
+<section class="section">
+  <h2><span class="eyebrow">01</span> Vue d'ensemble</h2>
+  <p class="section-sub">Résultats agrégés sur l'ensemble des canaux testés.</p>
+  <div class="kpis">
+    <div class="kpi"><div class="val" id="kpi-total">—</div><div class="lbl">Tests totaux</div></div>
+    <div class="kpi"><div class="val pass-c" id="kpi-passed">—</div><div class="lbl">Réussis</div></div>
+    <div class="kpi"><div class="val fail-c" id="kpi-failed">—</div><div class="lbl">Échoués</div></div>
+    <div class="kpi"><div class="val halluc-c" id="kpi-halluc">—</div><div class="lbl">Hallucinations</div></div>
+  </div>
+</section>
+
+<section class="section">
+  <h2><span class="eyebrow">02</span> Graphiques</h2>
+  <p class="section-sub">Détail visuel par canal, par dimension de score et par latence.</p>
+  <div class="charts-grid">
+    <div class="chart-card full" id="chart-gauges"></div>
+    <div class="chart-card" id="chart-stack"></div>
+    <div class="chart-card" id="chart-pie"></div>
+    <div class="chart-card" id="chart-scores"></div>
+    <div class="chart-card full" id="chart-latency"></div>
+  </div>
+</section>
+
+<section class="section" id="gallery-section" style="display:none;">
+  <h2><span class="eyebrow">03</span> Captures d'écran réelles</h2>
+  <p class="section-sub">Chaque capture provient d'une exécution Playwright réelle — clique pour zoomer.</p>
+  <div class="gallery" id="gallery"></div>
+</section>
+
+<section class="section">
+  <h2><span class="eyebrow">04</span> Détail des cas de test</h2>
+  <p class="section-sub">Filtre par canal pour explorer chaque scénario individuellement. BLEU / ROUGE-L / NLI sont informatifs (n'affectent pas le verdict) — « — » si non disponibles pour ce cas.</p>
+  <div class="filters" id="filters">
+    <button class="filter-btn active" data-filter="all">Tous</button>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>ID</th><th>Nom</th><th>Canal</th><th>Verdict</th><th>Score</th><th>Latence</th><th>BLEU</th><th>ROUGE-L</th><th>NLI</th><th>Détail</th></tr></thead>
+      <tbody id="results-body"></tbody>
+    </table>
+  </div>
+</section>
+
+</div>
+
+<footer>
+  <span>TechShop QA Studio — pipeline Generator → Executor → Evaluator → Reporter (Swarm + Ollama)</span>
+  <span class="mono" id="footer-refresh">—</span>
+</footer>
+
+<div id="lightbox" onclick="closeLightbox()">
+  <img id="lightbox-img" src="" alt="">
+  <div class="cap" id="lightbox-cap"></div>
+</div>
+
+<script>
+const VERDICT_LABELS = { PASS: "Réussi", FAIL: "Échoué", WARN: "Alerte", ERROR: "Erreur technique" };
+const VERDICT_COLORS = { PASS: "#34D399", FAIL: "#F87171", WARN: "#FBBF24", ERROR: "#94A3B8" };
+const CANAL_LABELS = { api: "API (backend)", web: "Interface Web", mobile: "Application Mobile" };
+const badgeClass = v => ({PASS:"pass",FAIL:"fail",WARN:"warn",ERROR:"error"}[v] || "error");
+
+function openLightbox(src, caption) {
+  document.getElementById("lightbox-img").src = src;
+  document.getElementById("lightbox-cap").textContent = caption;
+  document.getElementById("lightbox").style.display = "flex";
+}
+function closeLightbox() { document.getElementById("lightbox").style.display = "none"; }
+
+let currentFilter = "all";
+let lastResults = [];
+
+const nlpCell = v => (v === null || v === undefined) ? '<span class="dim">—</span>' : v;
+
+function renderTable() {
+  const body = document.getElementById("results-body");
+  body.innerHTML = lastResults
+    .filter(r => currentFilter === "all" || r.canal === currentFilter)
+    .map(r => `
+      <tr>
+        <td class="mono">${r.id}</td>
+        <td>${r.name || ""}</td>
+        <td>${CANAL_LABELS[r.canal] || r.canal}</td>
+        <td><span class="badge ${badgeClass(r.verdict)}">${VERDICT_LABELS[r.verdict] || r.verdict}</span></td>
+        <td class="mono">${(r.score_moyen ?? 0)}/5</td>
+        <td class="mono">${Math.round(r.latency_ms || 0)} ms</td>
+        <td class="mono">${nlpCell(r.bleu_score)}</td>
+        <td class="mono">${nlpCell(r.rouge_l_score)}</td>
+        <td class="mono">${nlpCell(r.nli_entailment_score)}</td>
+        <td class="reason">${r.reason || ""}</td>
+      </tr>`).join("");
+}
+
+function renderGallery(gallery) {
+  const section = document.getElementById("gallery-section");
+  const el = document.getElementById("gallery");
+  if (!gallery.length) { section.style.display = "none"; return; }
+  section.style.display = "block";
+  el.innerHTML = gallery.map(item => `
+    <figure class="shot" onclick="openLightbox('${item.url}','${(item.id + " — " + (item.name||"")).replace(/'/g,"")}')">
+      <img src="${item.url}" loading="lazy" alt="${item.id}">
+      <figcaption>
+        <span class="shot-id">${item.id}</span>
+        <span class="badge ${badgeClass(item.verdict)}">${VERDICT_LABELS[item.verdict] || "Capture"}</span>
+      </figcaption>
+    </figure>`).join("");
+}
+
+function renderCharts(stats, results, canalNames) {
+  const layout = (title, extra={}) => ({
+    title: { text: title, font: { family: "Space Grotesk, sans-serif", color: "#E7ECF5", size: 15 } },
+    paper_bgcolor: "rgba(0,0,0,0)", plot_bgcolor: "rgba(0,0,0,0)",
+    font: { family: "Inter, sans-serif", color: "#C7D0E0", size: 12 },
+    margin: { t: 44, l: 40, r: 20, b: 40 },
+    xaxis: { gridcolor: "#232B3F" }, yaxis: { gridcolor: "#232B3F" },
+    legend: { font: { color: "#C7D0E0" } },
+    ...extra
+  });
+  const config = { displayModeBar: false, responsive: true };
+
+  // Jauges par canal
+  const gaugeData = canalNames.map((c, i) => ({
+    type: "indicator", mode: "gauge+number",
+    value: stats.canaux[c.toLowerCase()] ? Math.round((stats.canaux[c.toLowerCase()].passed / (stats.canaux[c.toLowerCase()].total||1)) * 1000)/10 : 0,
+    title: { text: c, font: { color: "#C7D0E0" } },
+    number: { font: { color: "#E7ECF5" } },
+    domain: { row: 0, column: i },
+    gauge: { axis: { range: [0,100], tickcolor: "#8B96AD" }, bar: { color: "#6D5DFB" },
+      bgcolor: "#131A2B", bordercolor: "#232B3F",
+      steps: [{range:[0,50],color:"#2A1620"},{range:[50,80],color:"#2A2410"},{range:[80,100],color:"#12281F"}] }
+  }));
+  Plotly.newPlot("chart-gauges", gaugeData, {
+    ...layout("Taux de réussite par canal (%)"),
+    grid: { rows: 1, columns: canalNames.length, pattern: "independent" }, height: 240
+  }, config);
+
+  // Verdicts empilés
+  const verdictKeys = ["PASS","FAIL","WARN","ERROR"];
+  const stackTraces = verdictKeys.map(v => ({
+    type: "bar", name: VERDICT_LABELS[v], marker: { color: VERDICT_COLORS[v] },
+    x: canalNames,
+    y: canalNames.map(c => results.filter(r => r.canal_group === c && r.verdict === v).length)
+  }));
+  Plotly.newPlot("chart-stack", stackTraces, { ...layout("Verdicts par canal"), barmode: "stack", height: 300 }, config);
+
+  // Camembert global
+  const globalCounts = verdictKeys.map(v => results.filter(r => r.verdict === v).length);
+  Plotly.newPlot("chart-pie", [{
+    type: "pie", labels: verdictKeys.map(v => VERDICT_LABELS[v]), values: globalCounts,
+    marker: { colors: verdictKeys.map(v => VERDICT_COLORS[v]) }, hole: 0.55,
+    textfont: { color: "#0B0F1A" }
+  }], { ...layout("Répartition globale"), height: 300 }, config);
+
+  // Scores moyens par dimension
+  const dims = ["pertinence","exactitude","coherence"];
+  const scoreTraces = canalNames.map(c => {
+    const subset = results.filter(r => r.canal_group === c);
+    const n = subset.length || 1;
+    return {
+      type: "bar", name: c,
+      x: ["Pertinence","Exactitude","Cohérence"],
+      y: dims.map(d => Math.round((subset.reduce((a,r)=>a+(r[d]||0),0)/n) * 100)/100)
+    };
+  });
+  Plotly.newPlot("chart-scores", scoreTraces, { ...layout("Scores moyens (sur 5)"), barmode: "group", yaxis: {range:[0,5], gridcolor:"#232B3F"}, height: 300 }, config);
+
+  // Latence par test
+  const latTraces = canalNames.map(c => {
+    const subset = results.filter(r => r.canal_group === c);
+    return { type: "bar", name: c, x: subset.map(r=>r.id), y: subset.map(r=>r.latency_ms||0) };
+  });
+  Plotly.newPlot("chart-latency", latTraces, { ...layout("Latence par cas de test (ms)"), height: 340, xaxis: { tickangle: -45, gridcolor:"#1A2136" } }, config);
+}
+
+async function loadDashboard() {
+  try {
+    const [statsRes, detailsRes] = await Promise.all([
+      fetch("/api/pipeline-stats"), fetch("/api/pipeline-details")
+    ]);
+    const stats = await statsRes.json();
+    const details = await detailsRes.json();
+
+    document.getElementById("refresh-label").textContent = "Actualisé " + new Date().toLocaleTimeString("fr-FR");
+    document.getElementById("footer-refresh").textContent = "Prochaine actualisation dans 15s";
+
+    if (!stats.has_data) {
+      document.getElementById("empty-state").style.display = "block";
+      document.getElementById("content").style.display = "none";
+      return;
+    }
+    document.getElementById("empty-state").style.display = "none";
+    document.getElementById("content").style.display = "block";
+
+    document.getElementById("rate-big").textContent = stats.success_rate + "%";
+    document.getElementById("hero-sub").textContent =
+      `${stats.total} scénarios exécutés sur ${details.canal_names.length} canal(aux) : ${details.canal_names.join(", ")}`;
+    document.getElementById("kpi-total").textContent = stats.total;
+    document.getElementById("kpi-passed").textContent = stats.passed;
+    document.getElementById("kpi-failed").textContent = stats.failed;
+    document.getElementById("kpi-halluc").textContent = stats.hallucinations;
+
+    lastResults = details.results;
+    renderTable();
+    renderGallery(details.gallery);
+    try {
+      renderCharts(stats, details.results, details.canal_names);
+    } catch (chartErr) {
+      console.error("Erreur lors du rendu des graphiques :", chartErr);
+    }
+
+    const filtersEl = document.getElementById("filters");
+    filtersEl.innerHTML = `<button class="filter-btn ${currentFilter==='all'?'active':''}" data-filter="all">Tous</button>` +
+      details.canal_names.map(c => `<button class="filter-btn ${currentFilter===c?'active':''}" data-filter="${c}">${c}</button>`).join("");
+    filtersEl.querySelectorAll(".filter-btn").forEach(btn => {
+      btn.onclick = () => {
+        currentFilter = btn.dataset.filter;
+        filtersEl.querySelectorAll(".filter-btn").forEach(b => b.classList.toggle("active", b === btn));
+        renderTable();
+      };
+    });
+  } catch (e) {
+    document.getElementById("refresh-label").textContent = "Erreur de connexion";
+  }
+}
+
+loadDashboard();
+setInterval(loadDashboard, 15000);
+</script>
+</body>
+</html>
